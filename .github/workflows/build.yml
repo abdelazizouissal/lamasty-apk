@@ -1,4 +1,4 @@
-name: Build APK
+herename: Build APK
 
 on:
   push:
@@ -9,23 +9,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Install Android SDK
-        run: |
-          sudo apt-get install -y wget unzip
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-          unzip commandlinetools-linux-9477386_latest.zip -d $HOME/android
-          yes | $HOME/android/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/Android/Sdk "platforms;android-34" "build-tools;34.0.0"
+
+      - uses: android-actions/setup-android@v3
+
       - name: Build APK
-        env:
-          ANDROID_HOME: $HOME/Android/Sdk
         run: |
-          gradle assembleRelease
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - uses: actions/upload-artifact@v4
         with:
           name: lamasty-apk
-          path: app/build/outputs/apk/release/*.apk
+          path: app/build/outputs/apk/debug/*.apk
