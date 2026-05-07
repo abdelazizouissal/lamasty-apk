@@ -13,10 +13,17 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Build APK
+      - name: Install Android SDK
         run: |
-          chmod +x gradlew
-          ./gradlew assembleRelease
+          sudo apt-get install -y wget unzip
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip commandlinetools-linux-9477386_latest.zip -d $HOME/android
+          yes | $HOME/android/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/Android/Sdk "platforms;android-34" "build-tools;34.0.0"
+      - name: Build APK
+        env:
+          ANDROID_HOME: $HOME/Android/Sdk
+        run: |
+          gradle assembleRelease
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
